@@ -7,7 +7,7 @@ load("rda/commodities.rdata")
 
 commodities %>%
   ggplot(aes(date, crude_oil_net_change_since_start_date)) +
-  geom_point()
+  geom_point(color = "red")
 
 ggsave("crude_oil_price_history.png")
 
