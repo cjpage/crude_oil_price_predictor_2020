@@ -17,4 +17,4 @@ commodities <- commodities %>%
   mutate(wheat_net_change_since_start_date = Wheat - Wheat[1]) %>%
   mutate(rice_net_change_since_start_date = Rice - Rice[1]) %>%
   mutate(soybean_net_change_since_start_date = Soybeans - Soybeans[1])
-
+save(commodities, file = "rda/commodities.rdata")
