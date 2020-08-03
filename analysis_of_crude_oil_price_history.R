@@ -7,7 +7,10 @@ load("rda/commodities.rdata")
 
 commodities %>%
   ggplot(aes(date, crude_oil_net_change_since_start_date)) +
-  geom_point(color = "red")
+  geom_point(color = "red") +
+  xlab("Date") +
+  ylab("Net Change of Closing Price") +
+  ggtitle("Crude Oil Price History August 2010 to July 2020")
 
 ggsave("crude_oil_price_history.png")
 
