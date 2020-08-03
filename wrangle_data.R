@@ -1,4 +1,4 @@
-### First, this script reads "data/commodity_prices_2010_2020.csv" into a new data frame named" commodities"
+### First, this script reads "data/commodity_prices_2010_2020.csv" into a new data frame named "commodities"
 ### Then, it saves that data frame into a compressed .RDATA data set under the RDA subdirectory
 ### Finally, it mutates the data set to support enable the envisioned analysis
 ### Most notably, it adds columns showing net price changes since start
