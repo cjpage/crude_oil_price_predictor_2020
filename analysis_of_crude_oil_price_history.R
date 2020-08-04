@@ -14,6 +14,6 @@ crude_oil_plot <- commodities %>%
   ggtitle("Crude Oil Price History: 8/2010 - 7/2020")
   theme_economist()
 
-ggsave("crude_oil_price_history.png")
+ggsave("fig/crude_oil_price_history.png")
 
   
