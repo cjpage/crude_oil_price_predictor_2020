@@ -18,11 +18,17 @@ energy_sector_plot <- energy_sector %>%
   geom_point(aes(date, natural_gas), color = "#E69F00", size = 0.75) +
   geom_point(aes(date, heating_oil), color = "#CC79A7", size = 0.75) +
   geom_point(aes(date, gasoline), color = "#0072B2", size = 0.75) +
-  geom_point(aes(date, crude_oil), color = "#D55E00", size = 1) +
+  geom_point(aes(date, crude_oil), color = "#D55E00") +
   xlab("Date") +
   ylab("Net Change of Closing Price") +
-  ggtitle("Crude Oil versus Other Energy Commodities") +
-  theme_economist()
+  ggtitle("Crude Oil Price History: 8/2010 - 7/2020") +
+  theme_economist() +
+  theme(legend.position="top",
+        legend.title = element_blank(),
+        legend.box = "horizontal" ,
+        legend.text=element_text(size=8.5)) +
+        labs(color = "Commodity") +
+  guides(col = guide_legend(nrow = 1))
 
 ggsave("fig/crude_oil_in_comparison_to_three_other_energy_sector_commodities.png")
 

@@ -9,10 +9,11 @@ load("rda/commodities.rdata")
 
 crude_oil_plot <- commodities %>%
   ggplot(aes(date, crude_oil_net_change_since_start_date)) +
-  geom_point(aes(color = "#D55E00"), show.legend = FALSE) +
+  geom_point(aes(color = "Crude Oil")) +
+  labs(color = "Commodity") +
   xlab("Date") +
   ylab("Net Change of Closing Price") +
-  ggtitle("Crude Oil Price History: 8/2010 - 7/2020")
+  ggtitle("Crude Oil Price History: 8/2010 - 7/2020") +
   theme_economist() +
     theme(legend.position="top",
           legend.title = element_blank(),
