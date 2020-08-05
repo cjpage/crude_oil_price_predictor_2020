@@ -15,14 +15,21 @@ agriculture_sector <- data.frame(date = commodities$date,
 
 agriculture_sector_plot <- agriculture_sector %>%
   ggplot() +
-  geom_point(aes(date, wheat), color = "#E69F00", size = 0.75) +
-  geom_point(aes(date, rice), color = "#CC79A7", size = 0.75) +
-  geom_point(aes(date, soybeans), color = "#0072B2", size = 0.75) +
+  geom_point(aes(date, wheat), color = "#E69F00", size = 0.1) +
+  geom_point(aes(date, rice), color = "#CC79A7", size = 0.1) +
+  geom_point(aes(date, soybeans), color = "#0072B2", size = 0.1) +
   geom_point(aes(date, crude_oil), color = "#D55E00", size = 1) +
   xlab("Date") +
   ylab("Net Change of Closing Price") +
-  ggtitle("Crude Oil versus Agriculture Commodities") +
-  theme_economist()
+  ggtitle("Crude Oil vs Agriculture Commodities") +
+  theme_economist() +
+  theme(legend.position="top",
+        legend.title = element_blank(),
+        legend.box = "horizontal" ,
+        legend.text=element_text(size=8.5)) +
+  guides(col = guide_legend(nrow = 1))
+
+agriculture_sector_plot
 
 ggsave("fig/crude_oil_in_comparison_to_three_agriculture_sector_commodities.png")
 

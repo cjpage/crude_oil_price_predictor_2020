@@ -21,8 +21,15 @@ precious_metals_sector_plot <- precious_metals_sector %>%
   geom_point(aes(date, crude_oil), color = "#D55E00", size = 1) +
   xlab("Date") +
   ylab("Net Change of Closing Price") +
-  ggtitle("Crude Oil versus Precious Metals Commodities") +
-  theme_economist()
+  ggtitle("Crude Oil vs Precious Metals Commodities") +
+  theme_economist() +
+  theme(legend.position="top",
+        legend.title = element_blank(),
+        legend.box = "horizontal" ,
+        legend.text=element_text(size=8.5)) +
+  guides(col = guide_legend(nrow = 1))
+
+precious_metals_sector_plot
 
 ggsave("fig/crude_oil_in_comparison_to_three_precious_metals_sector_commodities.png")
 
