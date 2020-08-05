@@ -15,9 +15,9 @@ precious_metals_sector <- data.frame(date = commodities$date,
 
 precious_metals_sector_plot <- precious_metals_sector %>%
   ggplot() +
-  geom_point(aes(date, gold), color = "#E69F00", size = 0.5) +
-  geom_point(aes(date, silver), color = "#CC79A7", size = 0.5) +
-  geom_point(aes(date, platinum), color = "#0072B2", size = 0.5) +
+  geom_point(aes(date, gold), color = "#E69F00", size = 0.75) +
+  geom_point(aes(date, silver), color = "#CC79A7", size = 0.75) +
+  geom_point(aes(date, platinum), color = "#0072B2", size = 0.75) +
   geom_point(aes(date, crude_oil), color = "#D55E00", size = 1) +
   xlab("Date") +
   ylab("Net Change of Closing Price") +
