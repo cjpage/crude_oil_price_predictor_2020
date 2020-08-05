@@ -3,7 +3,7 @@
 ### Finally, it mutates the data set to support enable the envisioned analysis
 library(lubridate)
 commodities <- read_csv("data/commodity_closing_prices_2010_2020.csv")
-commodities <- commodities2 %>%
+commodities <- commodities %>%
   mutate(date = as.Date(mdy(Date))) %>%
   mutate(commodity = Commodity) %>%
   mutate(sector = Sector) %>%
