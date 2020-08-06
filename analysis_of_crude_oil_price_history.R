@@ -3,6 +3,8 @@ library(ggplot2)
 library(ggthemes)
 library(ggrepel)
 library(dplyr)
+library(lubridate)
+library(caret)
 
 load("rda/commodities.rdata")
 

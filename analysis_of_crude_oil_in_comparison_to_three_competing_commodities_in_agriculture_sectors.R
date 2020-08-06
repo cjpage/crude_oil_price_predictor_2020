@@ -1,6 +1,11 @@
 library(tidyverse)
 library(ggplot2)
 library(ggthemes)
+library(ggrepel)
+library(dplyr)
+library(lubridate)
+library(caret)
+
 load("rda/commodities.rdata")
 
 ### First, this script generates a date frame with crude oil and three competing commodities from the agriculture sector
@@ -31,3 +36,4 @@ crude_oil_vs_agriculture_plot <- crude_oil_vs_agriculture %>%
 crude_oil_vs_agriculture_plot
 
 ggsave("fig/crude_oil_in_comparison_to_three_agricultural_sector_commodities.png")
+
