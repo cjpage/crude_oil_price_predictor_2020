@@ -1,21 +1,7 @@
-library(tidyverse)
-library(ggplot2)
-library(ggthemes)
-library(ggrepel)
-library(dplyr)
-library(lubridate)
-library(caret)
+### This script plots the 2010-2020 timeline of crude oil daily closing prices compared to those of the other energy sector commodities
+### Then, it saves the plot in a .png file entitled "crude_oil_price_history_in_comparison_to_three_other_energy_sector_commodities"
 
-load("rda/commodities.rdata")
-
-### First, this script generates a date frame with crude oil and three competing commodities from the energy sector
-### Then, it plots the 2010-2020 timeline of crude oil daily closing prices compared to those of the other energy sector commodities
-### Finally, it saves the plot in a .png file entitled "crude_oil_price_history_in_comparison_to_three_other_energy_sector_commodities"
-
-crude_oil_vs_other_energy <- commodities %>%
-  filter(sector == 'Energy')
-
-crude_oil_vs_other_energy_plot <- crude_oil_vs_other_energy %>%
+crude_oil_vs_other_energy_plot <- energy %>%
   ggplot(aes(date, closing_price)) +
   geom_point(aes(color = commodity)) +
   xlab("Date") +
@@ -29,6 +15,7 @@ crude_oil_vs_other_energy_plot <- crude_oil_vs_other_energy %>%
   guides(col = guide_legend(nrow = 1))
 
 crude_oil_vs_other_energy_plot
+
 
 ggsave("fig/crude_oil_in_comparison_to_three_other_energy_sector_commodities.png")
 

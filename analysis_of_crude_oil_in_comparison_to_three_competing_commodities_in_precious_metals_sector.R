@@ -1,22 +1,5 @@
-library(tidyverse)
-library(ggplot2)
-library(ggthemes)
-library(ggrepel)
-library(dplyr)
-library(lubridate)
-library(caret)
-
-load("rda/commodities.rdata")
-
-### First, this script generates a date frame with crude oil and three competing commodities from the precious metals sector
-### Then, it plots the 2010-2020 timeline of crude oil daily closing prices compared to those of the three precious metals sector commodities
-### Finally, it saves the plot in a .png file entitled "crude_oil_price_history_in_comparison_to_three_competing_precious_metal_sector_commodities"
-
-crude_oil <- commodities %>%
-  filter(commodity == 'Crude Oil')
-
-precious_metals <- commodities %>%
-  filter(sector == 'Precious Metals')
+### This script plots the 2010-2020 timeline of crude oil daily closing prices compared to those of the three precious metals sector commodities
+### Then, it saves the plot in a .png file entitled "crude_oil_price_history_in_comparison_to_three_competing_precious_metal_sector_commodities"
 
 crude_oil_vs_precious_metals <- bind_rows(crude_oil, precious_metals)
 

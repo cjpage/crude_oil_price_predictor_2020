@@ -1,24 +1,11 @@
-library(tidyverse)
-library(ggplot2)
-library(ggthemes)
-library(ggrepel)
-library(dplyr)
-library(lubridate)
-library(caret)
-
-load("rda/commodities.rdata")
-
 ### First, this script plots the 2010-2020 timeline of crude oil daily closing prices
 ### Then, it saves the plot in a .png file entitled "crude_oil_price_history"
-
-crude_oil <- commodities %>%
-  filter(commodity == 'Crude Oil')
 
 crude_oil_plot <- crude_oil %>%
   ggplot(aes(date, closing_price)) +
   geom_point(aes(color = commodity)) +
   xlab("Date") +
-  ylab("Net Closing Price Change") +
+  ylab("Closing Price") +
   ggtitle("Crude Oil Price History: 8/2010 - 7/2020") +
   theme_economist() +
     theme(legend.position="top",
