@@ -12,12 +12,12 @@ load("rda/commodities.rdata")
 
 set.seed(755)
 
-test_index <- createDataPartition(y = commodities$Date, times = 1, p = 0.2,
+test_index <- createDataPartition(y = crude_oil$commodity, times = 1, p = 0.2,
                                   list = FALSE)
 
-commodities_train <- commodities[-test_index,]
+crude_oil_train <- crude_oil[-test_index,]
 
-commodities_test <- commodities[test_index,]
+crude_oil_test <- crude_oil[test_index,]
 
 ## Then, it defines RMSE
 
