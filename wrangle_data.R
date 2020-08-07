@@ -5,6 +5,7 @@ library(ggrepel)
 library(dplyr)
 library(lubridate)
 library(caret)
+library(randomForest)
 
 ### This part of the script reads "data/commodity_closing_prices_2010_2020.csv" into a new data frame named "commodities"
 ### Then, it mutates the resulting data set in way that will enable the envisioned analysis

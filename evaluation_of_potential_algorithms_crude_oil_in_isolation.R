@@ -1,11 +1,10 @@
-### This script evaluates a series of potentially viable algorithms for predicting cruide oil prices
-### Each of these four algorithms considers crude oil in isolation from other commodities
+### This script evaluates a series of potentially viable algorithms for predicting cruide oil closing prices
+### Each of these six algorithms considers crude oil in isolation from other globally traded commodities
+### In isolation, the available predictors are components (day, month, quarter, year) of time
 
-### Algorithm 01: Predicted Crude Oil Price Based on Average Crude Oil Price
+### Algorithm 01: Predicted Crude Oil Price Based on Average Crude Oil Price for 2010-2020
 
 mu <- mean(crude_oil_train$closing_price)
-
-mu
 
 predicted_price_algorithm_01 <- mu
 
@@ -70,5 +69,29 @@ predicted_price_algorithm_05 <- mu + crude_oil_test %>%
 RMSE05 <- RMSE(predicted_price_algorithm_05, crude_oil_test$closing_price)
 
 RMSE05
+
+### Algorithm 06: Predicted Crude Oil Price Based on Random Forest of Time Effects
+
+#### The first step is to look at a random forest incorporating year, quarter, month, and day components of time
+
+rf = randomForest(closing_price ~ date_year + date_quarter + date_month + date_weekday, data = crude_oil_train)
+
+##### The second is to build a plot to help determine which of those components is/are the most important predictors
+
+varImp(rf)
+
+###### Based on that plot, random forest will be revised to focus on the year and month components of time
+
+rf = randomForest(closing_price ~ date_year + date_month, data = crude_oil_train)
+
+####### That revised random forest is the basis of the sixth algorithm in this series
+
+pred <- predict(rf, newdata = crude_oil_train)
+RMSE(pred, crude_oil_train$closing_price)
+
+predicted_price_algorithm_06 <- predict(rf, newdata = crude_oil_test)
+RMSE06 <- RMSE(predicted_price_algorithm_06, crude_oil_test$closing_price)
+
+RMSE06
 
 

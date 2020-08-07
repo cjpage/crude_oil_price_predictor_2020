@@ -1,4 +1,4 @@
-### This script splits "commodities" into training and testing data sets
+### This script splits "crude_oil" into training and testing data sets
 
 library(tidyverse)
 library(ggplot2)

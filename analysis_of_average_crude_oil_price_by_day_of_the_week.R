@@ -16,3 +16,4 @@ crude_oil_average_by_day_of_the_week_plot <- crude_oil_average_by_day_of_the_wee
 crude_oil_average_by_day_of_the_week_plot
 
 ggsave("fig/crude_oil_average_by_day_of_the_week.png")
+

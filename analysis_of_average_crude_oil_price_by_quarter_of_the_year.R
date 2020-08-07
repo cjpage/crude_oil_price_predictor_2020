@@ -16,3 +16,4 @@ crude_oil_average_by_quarter_of_the_year_plot <- crude_oil_average_by_quarter_of
 crude_oil_average_by_quarter_of_the_year_plot
 
 ggsave("fig/crude_oil_average_by_quarter_of_the_year.png")
+
