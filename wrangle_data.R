@@ -98,4 +98,31 @@ soybeans <- agriculture %>%
   rename(soybeans_closing_price = closing_price)
 save(soybeans, file = "rda/soybeans.rdata")
 
+### This part generates a table that compares crude oil's closing price to the closing prices of all other commodities
+
+natural_gas_price_table <- natural_gas %>% select(date, natural_gas_closing_price)
+heating_oil_price_table <- heating_oil %>% select(date, heating_oil_closing_price)
+gasoline_price_table <- gasoline %>% select(date, gasoline_closing_price)
+
+gold_price_table <- gold %>% select(date, gold_closing_price)
+silver_price_table <- silver %>% select(date, silver_closing_price)
+platinum_price_table <- platinum %>% select(date, platinum_closing_price)
+
+wheat_price_table <- wheat %>% select(date, wheat_closing_price)
+rice_price_table <- rice %>% select(date, rice_closing_price)
+soybeans_price_table <- soybeans %>% select(date, soybeans_closing_price)
+
+crude_oil_in_commodities_market <- crude_oil %>%
+  left_join(natural_gas_price_table) %>%
+  left_join(heating_oil_price_table) %>%
+  left_join(gasoline_price_table) %>%
+  left_join(gold_price_table) %>%
+  left_join(silver_price_table) %>%
+  left_join(platinum_price_table) %>%
+  left_join(wheat_price_table) %>%
+  left_join(rice_price_table) %>%
+  left_join(soybeans_price_table)
+
+
+
 

@@ -1,18 +1,109 @@
 ### This script evaluates a second series of potentially viable algorithms for predicting cruide oil closing prices
-### Each of these six algorithms considers crude oil in comparison to other commodities from the energy sector
-### The predictors include not only time but the closing prices of natural gas, heating oil, and gasoline
+### Each of these algorithms considers crude oil in comparison to other commodities from the energy, precious metals, and agriculture sector
+### The predictors include not only time but the closing prices of natural gas, heating oil, gasoline, gold, silver, platinum, wheat, oil, and soybeans
 
-natural_gas <- energy %>%
-  filter(commodity == 'Natural Gas') %>%
-  mutate(natural_gas_closing_price = closing_price)
-save(commodities, file = "rda/natural_gas.rdata")
+### Algorithm 07: Predicted Crude Oil Price Based on Random Forest of Time and Energy Effects
 
-heating_oil <- energy %>%
-  filter(commodity == 'Heating Oil') %>%
-  mutate(heating_oil_closing_price = closing_price)
-save(commodities, file = "rda/heating_oil.rdata")
+#### The first step is to look at a random forest incorporating the key time components plus natural gas, heating oil, and gasoline
 
-gasoline <- energy %>%
-  filter(commodity == 'Gasoline') %>%
-  mutate(gasoline_closing_price = closing_price)
-save(commodities, file = "rda/gasoline.rdata")
+rf = randomForest(closing_price ~ date_year + 
+                    date_month + 
+                    natural_gas_closing_price + 
+                    heating_oil_closing_price + 
+                    gasoline_closing_price, data = crude_oil_train)
+
+##### The second is to build a plot to help determine which of those components is/are the most important predictors
+
+varImpPlot(rf)
+
+###### Based on that plot, random forest will be revised to focus on gasoline, heating oil, year, and natural gas effects
+
+rf = randomForest(closing_price ~ 
+                    gasoline_closing_price +
+                    heating_oil_closing_price +
+                    date_year + 
+                    natural_gas_closing_price, data = crude_oil_train)
+
+####### That revised random forest is the basis of the seventh algorithm in this series
+
+pred <- predict(rf, newdata = crude_oil_train)
+RMSE(pred, crude_oil_train$closing_price)
+
+predicted_price_algorithm_07 <- predict(rf, newdata = crude_oil_test)
+RMSE07 <- RMSE(predicted_price_algorithm_07, crude_oil_test$closing_price)
+
+RMSE07
+
+### Algorithm 08: Predicted Crude Oil Price Based on Random Forest of Time, Energy, and Precious Metal Effects
+
+#### The first step is to look at a random forest incorporating the key time and energy components plus gold, silver, and platinum
+
+rf = randomForest(closing_price ~ 
+                    gasoline_closing_price +
+                    heating_oil_closing_price +
+                    date_year + 
+                    natural_gas_closing_price +
+                    gold_closing_price +
+                    silver_closing_price +
+                    platinum_closing_price, data = crude_oil_train)
+
+##### The second is to build a plot to help determine which of those components is/are the most important predictors
+
+varImpPlot(rf)
+
+###### Based on that plot, random forest will be revised to focus on platinum, heating oil, year, gasoline, and silver
+
+rf = randomForest(closing_price ~ 
+                    platinum_closing_price +
+                    heating_oil_closing_price +
+                    date_year +
+                    gasoline_closing_price +
+                    silver_closing_price, data = crude_oil_train)
+
+####### That revised random forest is the basis of the eighth algorithm in this series
+
+pred <- predict(rf, newdata = crude_oil_train)
+RMSE(pred, crude_oil_train$closing_price)
+
+predicted_price_algorithm_08 <- predict(rf, newdata = crude_oil_test)
+RMSE08 <- RMSE(predicted_price_algorithm_08, crude_oil_test$closing_price)
+
+RMSE08
+
+### Algorithm 09: Predicted Crude Oil Price Based on Random Forest of Time, Energy, Precious Metal, and Agriculture Effects
+
+#### The first step is to look at a random forest incorporating the key time, energy, and precious metal components plus wheat, rice, and soybeans
+
+rf = randomForest(closing_price ~ 
+                    platinum_closing_price +
+                    heating_oil_closing_price +
+                    date_year +
+                    gasoline_closing_price +
+                    silver_closing_price +
+                    wheat_closing_price +
+                    rice_closing_price +
+                    soybeans_closing_price, data = crude_oil_train)
+
+##### The second is to build a plot to help determine which of those components is/are the most important predictors
+
+varImpPlot(rf)
+
+###### Based on that plot, random forest will be revised to focus on heating oil, gasoline, year, soybean, and wheat effects
+
+rf = randomForest(closing_price ~ 
+                    heating_oil_closing_price +
+                    gasoline_closing_price +
+                    date_year + 
+                    soybeans_closing_price +
+                    wheat_closing_price, data = crude_oil_train)
+
+####### That revised random forest is the basis of the ninth algorithm in this series
+
+pred <- predict(rf, newdata = crude_oil_train)
+RMSE(pred, crude_oil_train$closing_price)
+
+predicted_price_algorithm_09 <- predict(rf, newdata = crude_oil_test)
+RMSE09 <- RMSE(predicted_price_algorithm_09, crude_oil_test$closing_price)
+
+RMSE09
+
