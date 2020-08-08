@@ -29,11 +29,6 @@ save(commodities, file = "rda/commodities.rdata")
 
 ### This part generates and saves data sets focused on crude oil and the energy, precious metals, and agricultural sectors
 
-crude_oil <- commodities %>%
-  filter(commodity == 'Crude Oil') %>%
-  mutate(crude_oil_closing_price = closing_price)
-save(crude_oil, file = "rda/crude_oil.rdata")
-
 energy <- commodities %>%
   filter(sector == 'Energy')
 save(energy, file = "rda/energy.rdata")
@@ -45,5 +40,27 @@ save(precious_metals, file = "rda/precious_metals.rdata")
 agriculture <- commodities %>%
   filter(sector == 'Agriculture')
 save(agriculture, file = "rda/agriculture.rdata")
+
+### This part generates and saves data sets focused on each of the individual commodities in the three sectors
+
+crude_oil <- energy %>%
+  filter(commodity == 'Crude Oil') %>%
+  mutate(crude_oil_closing_price = closing_price)
+save(crude_oil, file = "rda/crude_oil.rdata")
+
+natural_gas <- energy %>%
+  filter(commodity == 'Natural Gas') %>%
+  mutate(natural_gas_closing_price = closing_price)
+save(natural_gas, file = "rda/natural_gas.rdata")
+
+heating_oil <- energy %>%
+  filter(commodity == 'Heating Oil') %>%
+  mutate(heating_oil_closing_price = closing_price)
+save(natural_gas, file = "rda/heating_oil.rdata")
+
+gasoline <- energy %>%
+  filter(commodity == 'Gasoline') %>%
+  mutate(gasoline_closing_price = closing_price)
+save(gasoline, file = "rda/gasoline.rdata")
 
 
