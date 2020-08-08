@@ -6,23 +6,61 @@ r### This script evaluates a second series of potentially viable algorithms for 
 
 #### The first step is to look at a random forest incorporating the key time components plus natural gas, heating oil, and gasoline
 
-rf = randomForest(closing_price ~ date_year + 
+nodesize <- seq(1, 5, 1)
+
+rmses <- sapply(nodesize, function(n){
+  rf = randomForest(closing_price ~ 
+                      date_year + 
+                      date_month + 
+                      natural_gas_closing_price + 
+                      heating_oil_closing_price + 
+                      gasoline_closing_price, 
+                  data = crude_oil_train, nodesize = n)
+  pred <- predict(rf, newdata = crude_oil_train)
+  RMSE(pred, crude_oil_train$closing_price)
+})
+
+qplot(nodesize, rmses)
+
+nodesize[which.min(rmses)]
+
+rf = randomForest(closing_price ~ 
+                    date_year + 
                     date_month + 
                     natural_gas_closing_price + 
                     heating_oil_closing_price + 
-                    gasoline_closing_price, data = crude_oil_train)
+                    gasoline_closing_price, 
+                  data = crude_oil_train, nodesize = nodesize[which.min(rmses)])
 
 ##### The second is to build a plot to help determine which of those components is/are the most important predictors
 
 varImpPlot(rf)
 
-###### Based on that plot, random forest will be revised to focus on gasoline, heating oil, year, and natural gas effects
+###### Based on that plot, random forest will be revised to focus on heating oil, gasoline, year, and natural gas effects
+
+nodesize <- seq(1, 4, 1)
+
+rmses <- sapply(nodesize, function(n){
+  rf = randomForest(closing_price ~ 
+                      date_year + 
+                      natural_gas_closing_price + 
+                      heating_oil_closing_price + 
+                      gasoline_closing_price, 
+                    data = crude_oil_train, nodesize = n)
+  pred <- predict(rf, newdata = crude_oil_train)
+  RMSE(pred, crude_oil_train$closing_price)
+})
+
+qplot(nodesize, rmses)
+
+nodesize[which.min(rmses)]
 
 rf = randomForest(closing_price ~ 
-                    gasoline_closing_price +
-                    heating_oil_closing_price +
                     date_year + 
-                    natural_gas_closing_price, data = crude_oil_train)
+                    natural_gas_closing_price + 
+                    heating_oil_closing_price + 
+                    gasoline_closing_price, 
+                  data = crude_oil_train, nodesize = nodesize[which.min(rmses)])
 
 ####### That revised random forest is the basis of the seventh algorithm in this series
 
@@ -38,27 +76,69 @@ RMSE07
 
 #### The first step is to look at a random forest incorporating the key time and energy components plus gold, silver, and platinum
 
+nodesize <- seq(1, 7, 1)
+
+rmses <- sapply(nodesize, function(n){
+  rf = randomForest(closing_price ~ 
+                      date_year + 
+                      natural_gas_closing_price + 
+                      heating_oil_closing_price + 
+                      gasoline_closing_price +
+                      gold_closing_price +
+                      silver_closing_price +
+                      platinum_closing_price,
+                    data = crude_oil_train, nodesize = n)
+  pred <- predict(rf, newdata = crude_oil_train)
+  RMSE(pred, crude_oil_train$closing_price)
+})
+
+qplot(nodesize, rmses)
+
+nodesize[which.min(rmses)]
+
 rf = randomForest(closing_price ~ 
-                    gasoline_closing_price +
-                    heating_oil_closing_price +
                     date_year + 
-                    natural_gas_closing_price +
+                    natural_gas_closing_price + 
+                    heating_oil_closing_price + 
+                    gasoline_closing_price +
                     gold_closing_price +
                     silver_closing_price +
-                    platinum_closing_price, data = crude_oil_train)
+                    platinum_closing_price,
+                  data = crude_oil_train, nodesize = nodesize[which.min(rmses)])
 
 ##### The second is to build a plot to help determine which of those components is/are the most important predictors
 
 varImpPlot(rf)
 
-###### Based on that plot, random forest will be revised to focus on platinum, heating oil, year, gasoline, and silver
+###### Based on that plot, random forest will be revised to focus on heating oil, platinum, gasoline, year, and silver effects
+
+nodesize <- seq(1, 6, 1)
+
+rmses <- sapply(nodesize, function(n){
+  rf = randomForest(closing_price ~ 
+                      heating_oil_closing_price + 
+                      platinum_closing_price +
+                      gasoline_closing_price +
+                      date_year + 
+                      silver_closing_price +
+                      natural_gas_closing_price, 
+                    data = crude_oil_train, nodesize = n)
+  pred <- predict(rf, newdata = crude_oil_train)
+  RMSE(pred, crude_oil_train$closing_price)
+})
+
+qplot(nodesize, rmses)
+
+nodesize[which.min(rmses)]
 
 rf = randomForest(closing_price ~ 
+                    heating_oil_closing_price + 
                     platinum_closing_price +
-                    heating_oil_closing_price +
-                    date_year +
                     gasoline_closing_price +
-                    silver_closing_price, data = crude_oil_train)
+                    date_year + 
+                    silver_closing_price +
+                    natural_gas_closing_price, 
+                  data = crude_oil_train, nodesize = nodesize[which.min(rmses)])
 
 ####### That revised random forest is the basis of the eighth algorithm in this series
 
@@ -74,33 +154,57 @@ RMSE08
 
 #### The first step is to look at a random forest incorporating the key time, energy, and precious metal components plus wheat, rice, and soybeans
 
+nodesize <- seq(1, 9, 1)
+
+rmses <- sapply(nodesize, function(n){
+  rf = randomForest(closing_price ~ 
+                      heating_oil_closing_price + 
+                      platinum_closing_price +
+                      gasoline_closing_price +
+                      date_year + 
+                      silver_closing_price +
+                      natural_gas_closing_price +
+                      wheat_closing_price +
+                      rice_closing_price +
+                      soybeans_closing_price,
+                    data = crude_oil_train, nodesize = n)
+  pred <- predict(rf, newdata = crude_oil_train)
+  RMSE(pred, crude_oil_train$closing_price)
+})
+
+qplot(nodesize, rmses)
+
+nodesize[which.min(rmses)]
+
 rf = randomForest(closing_price ~ 
+                    heating_oil_closing_price + 
                     platinum_closing_price +
-                    heating_oil_closing_price +
-                    date_year +
                     gasoline_closing_price +
+                    date_year + 
                     silver_closing_price +
+                    natural_gas_closing_price +
                     wheat_closing_price +
                     rice_closing_price +
-                    soybeans_closing_price, data = crude_oil_train)
+                    soybeans_closing_price,
+                  data = crude_oil_train, nodesize = nodesize[which.min(rmses)])
 
 ##### The second is to build a plot to help determine which of those components is/are the most important predictors
 
 varImpPlot(rf)
 
-###### Based on that plot, random forest will be revised to focus on heating oil, gasoline, year, month, platinum, soybean, and wheat effects
+###### Based on that plot, random forest will be revised to focus on heating oil, platinum, year, gasoline, soybean, and wheat effects
 
-nodesize <- seq(1, 5, 1)
+nodesize <- seq(1, 6, 1)
 
 rmses <- sapply(nodesize, function(n){
   rf = randomForest(closing_price ~ 
-                    heating_oil_closing_price +
-                    gasoline_closing_price +
-                    date_year + 
-                    date_month +
-                    platinum_closing_price +
-                    soybeans_closing_price +
-                    wheat_closing_price, data = crude_oil_train, nodesize = n)
+                      heating_oil_closing_price +
+                      platinum_closing_price +
+                      date_year + 
+                      gasoline_closing_price +
+                      soybeans_closing_price +
+                      wheat_closing_price, 
+                    data = crude_oil_train, nodesize = n)
 pred <- predict(rf, newdata = crude_oil_train)
 RMSE(pred, crude_oil_train$closing_price)
 })
@@ -111,12 +215,12 @@ nodesize[which.min(rmses)]
 
 rf = randomForest(closing_price ~ 
                     heating_oil_closing_price +
-                    gasoline_closing_price +
-                    date_year + 
-                    date_month +
                     platinum_closing_price +
+                    date_year + 
+                    gasoline_closing_price +
                     soybeans_closing_price +
-                    wheat_closing_price, data = crude_oil_train, nodesize = nodesize[which.min(rmses)])
+                    wheat_closing_price, 
+                  data = crude_oil_train, nodesize = nodesize[which.min(rmses)])
 
 pred <- predict(rf, newdata = crude_oil_train)
 
@@ -127,4 +231,23 @@ predicted_price_algorithm_09 <- predict(rf, newdata = crude_oil_test)
 RMSE09 <- RMSE(predicted_price_algorithm_09, crude_oil_test$closing_price)
 
 RMSE09
+
+###
+
+rf = randomForest(closing_price ~ .,
+                  data = crude_oil_train, nodesize = 1)
+
+pred <- predict(rf, newdata = crude_oil_train)
+
+RMSE(pred, crude_oil_train$closing_price)
+
+predicted_price_algorithm_10 <- predict(rf, newdata = crude_oil_test)
+
+RMSE10 <- RMSE(predicted_price_algorithm_10, crude_oil_test$closing_price)
+
+RMSE10
+
+varImpPlot(rf)
+
+
 
