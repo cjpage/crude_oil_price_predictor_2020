@@ -1,4 +1,4 @@
-### This script evaluates a second series of potentially viable algorithms for predicting cruide oil closing prices
+r### This script evaluates a second series of potentially viable algorithms for predicting cruide oil closing prices
 ### Each of these algorithms considers crude oil in comparison to other commodities from the energy, precious metals, and agriculture sector
 ### The predictors include not only time but the closing prices of natural gas, heating oil, gasoline, gold, silver, platinum, wheat, oil, and soybeans
 
@@ -88,14 +88,16 @@ rf = randomForest(closing_price ~
 
 varImpPlot(rf)
 
-###### Based on that plot, random forest will be revised to focus on heating oil, gasoline, year, soybean, and wheat effects
+###### Based on that plot, random forest will be revised to focus on heating oil, gasoline, year, month, platinum, soybean, and wheat effects
 
 rf = randomForest(closing_price ~ 
                     heating_oil_closing_price +
                     gasoline_closing_price +
                     date_year + 
+                    date_month +
+                    platinum_closing_price +
                     soybeans_closing_price +
-                    wheat_closing_price, data = crude_oil_train)
+                    wheat_closing_price, data = crude_oil_train, nodesize = 2)
 
 ####### That revised random forest is the basis of the ninth algorithm in this series
 
