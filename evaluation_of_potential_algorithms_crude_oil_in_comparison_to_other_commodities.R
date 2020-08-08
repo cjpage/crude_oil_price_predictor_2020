@@ -90,6 +90,25 @@ varImpPlot(rf)
 
 ###### Based on that plot, random forest will be revised to focus on heating oil, gasoline, year, month, platinum, soybean, and wheat effects
 
+nodesize <- seq(1, 5, 1)
+
+rmses <- sapply(nodesize, function(n){
+  rf = randomForest(closing_price ~ 
+                    heating_oil_closing_price +
+                    gasoline_closing_price +
+                    date_year + 
+                    date_month +
+                    platinum_closing_price +
+                    soybeans_closing_price +
+                    wheat_closing_price, data = crude_oil_train, nodesize = n)
+pred <- predict(rf, newdata = crude_oil_train)
+RMSE(pred, crude_oil_train$closing_price)
+})
+
+qplot(nodesize, rmses)
+
+nodesize[which.min(rmses)]
+
 rf = randomForest(closing_price ~ 
                     heating_oil_closing_price +
                     gasoline_closing_price +
@@ -97,14 +116,14 @@ rf = randomForest(closing_price ~
                     date_month +
                     platinum_closing_price +
                     soybeans_closing_price +
-                    wheat_closing_price, data = crude_oil_train, nodesize = 2)
-
-####### That revised random forest is the basis of the ninth algorithm in this series
+                    wheat_closing_price, data = crude_oil_train, nodesize = nodesize[which.min(rmses)])
 
 pred <- predict(rf, newdata = crude_oil_train)
+
 RMSE(pred, crude_oil_train$closing_price)
 
 predicted_price_algorithm_09 <- predict(rf, newdata = crude_oil_test)
+
 RMSE09 <- RMSE(predicted_price_algorithm_09, crude_oil_test$closing_price)
 
 RMSE09
