@@ -77,19 +77,19 @@ RMSE05
 
 ### ALGORITHM 06 (RANDOM FOREST - TIME)
 ##### This algorithm predicts crude oil closing prices based on a Random Forest of time components
-####### The first step is to look at a random forest incorporating date, year, quarter, month, and weekday components of time
+####### The first step is to look at a random forest incorporating year, quarter, month, weekday, and date components of time
 
 nodesize <- seq(1, 5, 1)
 
 rmses <- sapply(nodesize, function(n){
-  rf = randomForest(closing_price ~ 
-                      date +
-                      date_year + 
-                      date_quarter +
-                      date_month +
-                      date_weekday, 
-                    data = crude_oil_train, nodesize = n)
-  pred <- predict(rf, newdata = crude_oil_train)
+  rf_time = randomForest(closing_price ~ 
+                           date_year + 
+                           date_quarter +
+                           date_month +
+                           date_weekday +
+                           date, 
+                         data = crude_oil_train, nodesize = n)
+  pred <- predict(rf_time, newdata = crude_oil_train)
   RMSE(pred, crude_oil_train$closing_price)
 })
 
@@ -97,28 +97,28 @@ qplot(nodesize, rmses)
 
 nodesize[which.min(rmses)]
 
-rf = randomForest(closing_price ~ 
-                    date +
-                    date_year + 
-                    date_quarter +
-                    date_month +
-                    date_weekday,
-                  data = crude_oil_train, nodesize = nodesize[which.min(rmses)])
+rf_time = randomForest(closing_price ~ 
+                         date_year + 
+                         date_quarter +
+                         date_month +
+                         date_weekday +
+                         date,
+                       data = crude_oil_train, nodesize = nodesize[which.min(rmses)])
 
 ####### The second is to build a plot to help determine which of those components is/are the most important predictors
 
-varImpPlot(rf)
+varImpPlot(rf_time)
 
 ####### Based on that plot, Random Forest will be revised to focus on the date, year, and month components of time
 
 nodesize <- seq(1, 3, 1)
 
 rmses <- sapply(nodesize, function(n){
-  rf = randomForest(closing_price ~ 
-                      date +
-                      date_year + 
-                      date_month, 
-                    data = crude_oil_train, nodesize = n)
+  rf_time = randomForest(closing_price ~ 
+                           date +
+                           date_year + 
+                           date_month, 
+                         data = crude_oil_train, nodesize = n)
   pred <- predict(rf, newdata = crude_oil_train)
   RMSE(pred, crude_oil_train$closing_price)
 })
@@ -127,63 +127,88 @@ qplot(nodesize, rmses)
 
 nodesize[which.min(rmses)]
 
-rf = randomForest(closing_price ~ 
+rf_time = randomForest(closing_price ~ 
                     date +
                     date_year + 
                     date_month, 
                   data = crude_oil_train, nodesize = nodesize[which.min(rmses)])
 
-pred <- predict(rf, newdata = crude_oil_train)
+pred <- predict(rf_time, newdata = crude_oil_train)
 
 RMSE(pred, crude_oil_train$closing_price)
 
-predicted_price_algorithm_06 <- predict(rf, newdata = crude_oil_test)
+predicted_price_algorithm_06 <- predict(rf_time, newdata = crude_oil_test)
 
 RMSE06 <- RMSE(predicted_price_algorithm_06, crude_oil_test$closing_price)
 
 RMSE06
 
 ### ALGORITHM 07 (KNN - TIME)
-##### This algorithm predicts crude oil closing prices based on a K-Nearest Neighbors (KNN) model of time components
+##### This algorithm predicts crude oil closing prices based on a K-Nearest Neighbors (KNN) model of the three key time components
 
-train_knn <- train(closing_price ~ 
-                     date +
-                     date_year + 
-                     date_month, 
+knn_time <- train(closing_price ~ 
+                    date +
+                    date_year + 
+                    date_month, 
                    method = "knn",
                    data = crude_oil_train)
 
-ggplot(train_knn, highlight = TRUE)
+ggplot(knn_time, highlight = TRUE)
 
-pred <- predict(train_knn, newdata = crude_oil_train)
+pred <- predict(knn_time, newdata = crude_oil_train)
 
 RMSE(pred, crude_oil_train$closing_price)
 
-predicted_price_algorithm_07 <- predict(train_knn, newdata = crude_oil_test)
+predicted_price_algorithm_07 <- predict(knn_time, newdata = crude_oil_test)
 
 RMSE07 <- RMSE(predicted_price_algorithm_07, crude_oil_test$closing_price)
 
 RMSE07
 
 ### ALGORITHM 08 (RANGER - TIME)
-##### This algorithm predicts crude oil closing prices based on a RANGER model of time components
+##### This algorithm predicts crude oil closing prices based on a RANGER model of the three key time components
 
-train_ranger <- train(closing_price ~ 
-                     date +
-                     date_year + 
-                     date_month, 
-                   method = "ranger",
-                   data = crude_oil_train)
+ranger_time <- train(closing_price ~ 
+                       date +
+                       date_year + 
+                       date_month, 
+                     method = "ranger",
+                     data = crude_oil_train)
 
-pred <- predict(train_ranger, newdata = crude_oil_train)
+pred <- predict(ranger_time, newdata = crude_oil_train)
 
 RMSE(pred, crude_oil_train$closing_price)
 
-predicted_price_algorithm_08 <- predict(train_ranger, newdata = crude_oil_test)
+predicted_price_algorithm_08 <- predict(ranger_time, newdata = crude_oil_test)
 
 RMSE08 <- RMSE(predicted_price_algorithm_08, crude_oil_test$closing_price)
 
 RMSE08
 
+### SUMMARY TO THIS POINT
+
+ALGORITHM_tab <- c("ALGORITHM 01 - Average Closing Price",
+                   "ALGORITHM 02 - Average Closing Price plus Day Effects",
+                   "ALGORITHM 03 - Average Closing Price plus Month Effects",
+                   "ALGORITHM 04 - Average Closing Price plus Quarter Effects",
+                   "ALGORITHM 05 - Average Closing Price plus Yer Effects",
+                   "ALGORITHM 06 - Random Forest of Time Components",
+                   "ALGORITHM 07 - KNN Model of Time Components",
+                   "ALGORITHM 08 - Ranger Model of Time Components")
+
+RMSE_tab <- c(RMSE01,
+              RMSE02,
+              RMSE03,
+              RMSE04,
+              RMSE05,
+              RMSE06,
+              RMSE07,
+              RMSE08)
+
+Results <- data.frame(ALGORITHM_tab, RMSE_tab)
+
+Results %>%
+  arrange(RMSE_tab) %>%
+  print(right = FALSE)
 
 
