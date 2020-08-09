@@ -1,5 +1,5 @@
 ### This script evaluates a series of potentially viable algorithms for predicting cruide oil closing prices
-### Each of these six algorithms considers crude oil in isolation from other globally traded commodities
+### Each of these eight algorithms considers crude oil in isolation from other globally traded commodities
 ### In isolation, the available predictors are components (day, month, quarter, year) of time
 
 ### ALGORITHM 01 (AVERAGE)
