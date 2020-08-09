@@ -249,5 +249,114 @@ RMSE10
 
 varImpPlot(rf)
 
+#### KNN
 
+train_knn <- train(closing_price ~ 
+                     date +
+                     date_year + 
+                     date_month +
+                     date_weekday +
+                     natural_gas_closing_price +
+                     heating_oil_closing_price + 
+                     gasoline_closing_price +
+                     gold_closing_price +
+                     platinum_closing_price +
+                     silver_closing_price +
+                     wheat_closing_price +
+                     rice_closing_price +
+                     soybeans_closing_price, 
+                   method = "knn",
+                   data = crude_oil_train)
 
+ggplot(train_knn, highlight = TRUE)
+
+pred <- predict(train_knn, newdata = crude_oil_train)
+
+RMSE(pred, crude_oil_train$closing_price)
+
+predicted_price_algorithm_11 <- predict(train_knn, newdata = crude_oil_test)
+
+RMSE11 <- RMSE(predicted_price_algorithm_11, crude_oil_test$closing_price)
+
+RMSE11
+
+train_glm <- train(closing_price ~ 
+                     date +
+                     date_year + 
+                     date_month +
+                     date_weekday +
+                     natural_gas_closing_price +
+                     heating_oil_closing_price + 
+                     gasoline_closing_price +
+                     gold_closing_price +
+                     platinum_closing_price +
+                     silver_closing_price +
+                     wheat_closing_price +
+                     rice_closing_price +
+                     soybeans_closing_price, 
+                   method = "glm",
+                   data = crude_oil_train)
+
+pred <- predict(train_glm, newdata = crude_oil_train)
+
+RMSE(pred, crude_oil_train$closing_price)
+
+predicted_price_algorithm_12 <- predict(train_glm, newdata = crude_oil_test)
+
+RMSE12 <- RMSE(predicted_price_algorithm_12, crude_oil_test$closing_price)
+
+RMSE12
+
+train_kknn <- train(closing_price ~ 
+                     date +
+                     date_year + 
+                     date_month +
+                     date_weekday +
+                     natural_gas_closing_price +
+                     heating_oil_closing_price + 
+                     gasoline_closing_price +
+                     gold_closing_price +
+                     platinum_closing_price +
+                     silver_closing_price +
+                     wheat_closing_price +
+                     rice_closing_price +
+                     soybeans_closing_price, 
+                   method = "kknn",
+                   data = crude_oil_train)
+
+pred <- predict(train_kknn, newdata = crude_oil_train)
+
+RMSE(pred, crude_oil_train$closing_price)
+
+predicted_price_algorithm_13 <- predict(train_kknn, newdata = crude_oil_test)
+
+RMSE13 <- RMSE(predicted_price_algorithm_13, crude_oil_test$closing_price)
+
+RMSE13
+
+train_ranger <- train(closing_price ~ 
+                      date +
+                      date_year + 
+                      date_month +
+                      date_weekday +
+                      natural_gas_closing_price +
+                      heating_oil_closing_price + 
+                      gasoline_closing_price +
+                      gold_closing_price +
+                      platinum_closing_price +
+                      silver_closing_price +
+                      wheat_closing_price +
+                      rice_closing_price +
+                      soybeans_closing_price, 
+                    method = "ranger",
+                    data = crude_oil_train)
+
+pred <- predict(train_ranger, newdata = crude_oil_train)
+
+RMSE(pred, crude_oil_train$closing_price)
+
+predicted_price_algorithm_14 <- predict(train_ranger, newdata = crude_oil_test)
+
+RMSE14 <- RMSE(predicted_price_algorithm_14, crude_oil_test$closing_price)
+
+RMSE14
