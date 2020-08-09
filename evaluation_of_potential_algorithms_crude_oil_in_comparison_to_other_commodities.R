@@ -6,10 +6,11 @@ r### This script evaluates a second series of potentially viable algorithms for 
 
 #### The first step is to look at a random forest incorporating the key time components plus natural gas, heating oil, and gasoline
 
-nodesize <- seq(1, 5, 1)
+nodesize <- seq(1, 6, 1)
 
 rmses <- sapply(nodesize, function(n){
   rf = randomForest(closing_price ~ 
+                      date +
                       date_year + 
                       date_month + 
                       natural_gas_closing_price + 
@@ -25,6 +26,7 @@ qplot(nodesize, rmses)
 nodesize[which.min(rmses)]
 
 rf = randomForest(closing_price ~ 
+                    date +
                     date_year + 
                     date_month + 
                     natural_gas_closing_price + 
@@ -36,12 +38,13 @@ rf = randomForest(closing_price ~
 
 varImpPlot(rf)
 
-###### Based on that plot, random forest will be revised to focus on heating oil, gasoline, year, and natural gas effects
+###### Based on that plot, random forest will be revised to focus on heating oil, date, gasoline, and natural gas effects
 
-nodesize <- seq(1, 4, 1)
+nodesize <- seq(1, 5, 1)
 
 rmses <- sapply(nodesize, function(n){
   rf = randomForest(closing_price ~ 
+                      date +
                       date_year + 
                       natural_gas_closing_price + 
                       heating_oil_closing_price + 
@@ -56,6 +59,7 @@ qplot(nodesize, rmses)
 nodesize[which.min(rmses)]
 
 rf = randomForest(closing_price ~ 
+                    date +
                     date_year + 
                     natural_gas_closing_price + 
                     heating_oil_closing_price + 
@@ -360,3 +364,4 @@ predicted_price_algorithm_14 <- predict(train_ranger, newdata = crude_oil_test)
 RMSE14 <- RMSE(predicted_price_algorithm_14, crude_oil_test$closing_price)
 
 RMSE14
+
