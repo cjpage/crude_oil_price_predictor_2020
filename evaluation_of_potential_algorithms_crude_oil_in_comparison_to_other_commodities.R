@@ -1,4 +1,4 @@
-r### This script evaluates a second series of potentially viable algorithms for predicting cruide oil closing prices
+### This script evaluates a second series of potentially viable algorithms for predicting cruide oil closing prices
 ### Each of these algorithms considers crude oil in comparison to other commodities from the energy, precious metals, and agriculture sector
 ### The predictors include not only time but the closing prices of natural gas, heating oil, gasoline, gold, silver, platinum, wheat, oil, and soybeans
 
@@ -180,7 +180,7 @@ ranger_all <- train(closing_price ~
                       date +
                       date_weekday +
                       date_month +
-                      date_quarter +
+                      date_quarter_of_the_year +
                       date_year + 
                       heating_oil_closing_price + 
                       natural_gas_closing_price +

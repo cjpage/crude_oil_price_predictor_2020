@@ -17,8 +17,9 @@ commodities <- commodities %>%
   rename(date = Date) %>%
   mutate(date = as.Date(mdy(date))) %>%
   mutate(date_year = year(date)) %>%
-  mutate(date_quarter = quarter(date)) %>%
-  mutate(date_month = month(date)) %>%
+  mutate(date_quarter_of_the_year = quarter(date)) %>%
+  mutate(date_month = round_date(date, unit = "months")) %>%
+  mutate(date_month_of_the_year = month(date)) %>%
   mutate(date_day = day(date)) %>%
   mutate(date_weekday = weekdays(date)) %>%
   rename(commodity = Commodity) %>%
@@ -26,12 +27,6 @@ commodities <- commodities %>%
   rename(closing_price = `Closing Price`)
 
 save(commodities, file = "rda/commodities.rdata")
-
-### This part generates and saves a data set focused on crude oil
-
-crude_oil <- energy %>%
-  filter(commodity == 'Crude Oil')
-save(crude_oil, file = "rda/crude_oil.rdata")
 
 ### This part generates and saves data sets focused on the energy, precious metals, and agricultural sectors
 
@@ -46,6 +41,12 @@ save(precious_metals, file = "rda/precious_metals.rdata")
 agriculture <- commodities %>%
   filter(sector == 'Agriculture')
 save(agriculture, file = "rda/agriculture.rdata")
+
+### This part generates and saves a data set focused on crude oil
+
+crude_oil <- energy %>%
+  filter(commodity == 'Crude Oil')
+save(crude_oil, file = "rda/crude_oil.rdata")
 
 ### This part generates and saves data sets focused on the commodities (other than crude oil) in the energy sector
 
