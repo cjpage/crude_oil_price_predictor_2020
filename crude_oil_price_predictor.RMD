@@ -11,11 +11,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction/Overview/Executive Summary
 
-Cruide oil is an important commodity.  Some of our planet's inhabitants produce it.  Many more consume it either directly or in the form of such downstream products as aviation fuel and automotive gasoline.  All are affected by it in beneficial and detrimental ways. Because of its wide-ranging effects, effects that extend well beyond the realms of economics and diplomancy, crude oil commands collective attention enabled by careful and continuous analysis.
+Oil is an important commodity.  Some of our planet's inhabitants produce it.  Many more consume it. Because of its wide-ranging effects, oil commands collective attention enabled by continuous analysis.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+One key metric to take into account in the continuous analysis of the oil indutry is the daily closing price of crude oil futures traded on a global basis in such venues as the New York Mercantile Exchange. 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Methods for predicting that price may entail studying the quantitative and qualitative factors at play inside the oil industry as well as in such adjacent industries as shipping and manufacturing.
+
+They may also entail studying the complex geopolitical, military, social, and environmental developments that help explain why crude oil closing prices rise and fall as they do over time. 
+
+This project proposes a simpler method, one that predicts crude oil closing prices based on the closing prices of complementary (e.g., gasoline) and competing (e.g., platinum) commodities.
+
+The premises is that there is much to be learned by studying the behaviors of commodity traders engaged in making investment decisions based on running evaluations of risks and rewards. 
 
 ```{r cars}
 summary(cars)
