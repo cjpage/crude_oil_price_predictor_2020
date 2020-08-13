@@ -154,6 +154,59 @@ crude_oil_vs_other_energy_plot
 
 ggsave("fig/crude_oil_in_comparison_to_three_other_energy_sector_commodities.png")
 
+#### As a next step, it generates scatterplots portraying the relationships between crude oil closing prices and those of the other energy commodities
+
+crude_oil_natural_gas_scatterplot <- crude_oil_in_commodities_market %>%
+  ggplot(aes(closing_price, natural_gas_closing_price)) +
+  geom_point(aes(color = commodity), size = 1, show.legend = FALSE) +
+  xlab("Crude Oil Closing Price") +
+  ylab("Natural Gas Closing Price") +
+  ggtitle("Scatterplot of Crude Oil and Natural Gas Closing Prices: 2010 - 2020") +
+  theme_economist() +
+  theme(legend.position="top",
+        legend.title = element_blank(),
+        legend.box = "horizontal" ,
+        legend.text=element_text(size=8.5)) +
+  guides(col = guide_legend(nrow = 1))
+
+crude_oil_natural_gas_scatterplot
+
+ggsave("fig/scatterplot_crude_oil_versus_natural_gas.png")
+
+crude_oil_heating_oil_scatterplot <- crude_oil_in_commodities_market %>%
+  ggplot(aes(closing_price, heating_oil_closing_price)) +
+  geom_point(aes(color = commodity), size = 1, show.legend = FALSE) +
+  xlab("Crude Oil Closing Price") +
+  ylab("Heating Oil Closing Price") +
+  ggtitle("Scatterplot of Crude Oil and Heating Oil Closing Prices: 2010 - 2020") +
+  theme_economist() +
+  theme(legend.position="top",
+        legend.title = element_blank(),
+        legend.box = "horizontal" ,
+        legend.text=element_text(size=8.5)) +
+  guides(col = guide_legend(nrow = 1))
+
+crude_oil_heating_oil_scatterplot
+
+ggsave("fig/scatterplot_crude_oil_versus_heating_oil.png")
+
+crude_oil_gasoline_scatterplot <- crude_oil_in_commodities_market %>%
+  ggplot(aes(closing_price, gasoline_closing_price)) +
+  geom_point(aes(color = commodity), size = 1, show.legend = FALSE) +
+  xlab("Crude Oil Closing Price") +
+  ylab("Gasoline Closing Price") +
+  ggtitle("Scatterplot of Crude Oil and Gasoline Closing Prices: 2010 - 2020") +
+  theme_economist() +
+  theme(legend.position="top",
+        legend.title = element_blank(),
+        legend.box = "horizontal" ,
+        legend.text=element_text(size=8.5)) +
+  guides(col = guide_legend(nrow = 1))
+
+crude_oil_gasoline_scatterplot
+
+ggsave("fig/scatterplot_crude_oil_versus_gasoline.png")
+
 ### It plots the 2010-2020 timeline of crude oil daily closing prices compared to those of the three precious metals sector commodities
 ### Then, it saves the plot in a .png file entitled "crude_oil_price_history_in_comparison_to_three_competing_precious_metal_sector_commodities"
 
@@ -176,6 +229,59 @@ crude_oil_vs_precious_metals_plot
 
 ggsave("fig/crude_oil_in_comparison_to_three_precious_metals_sector_commodities.png")
 
+#### As a next step, it generates scatterplots portraying the relationships between crude oil closing prices and those of the precious metal commodities
+
+crude_oil_gold_scatterplot <- crude_oil_in_commodities_market %>%
+  ggplot(aes(closing_price, gold_closing_price)) +
+  geom_point(aes(color = commodity), size = 1, show.legend = FALSE) +
+  xlab("Crude Oil Closing Price") +
+  ylab("Gold Closing Price") +
+  ggtitle("Scatterplot of Crude Oil and Gold Closing Prices: 2010 - 2020") +
+  theme_economist() +
+  theme(legend.position="top",
+        legend.title = element_blank(),
+        legend.box = "horizontal" ,
+        legend.text=element_text(size=8.5)) +
+  guides(col = guide_legend(nrow = 1))
+
+crude_oil_gold_scatterplot
+
+ggsave("fig/scatterplot_crude_oil_versus_gold.png")
+
+crude_oil_silver_scatterplot <- crude_oil_in_commodities_market %>%
+  ggplot(aes(closing_price, silver_closing_price)) +
+  geom_point(aes(color = commodity), size = 1, show.legend = FALSE) +
+  xlab("Crude Oil Closing Price") +
+  ylab("Silver Closing Price") +
+  ggtitle("Scatterplot of Crude Oil and Silver Closing Prices: 2010 - 2020") +
+  theme_economist() +
+  theme(legend.position="top",
+        legend.title = element_blank(),
+        legend.box = "horizontal" ,
+        legend.text=element_text(size=8.5)) +
+  guides(col = guide_legend(nrow = 1))
+
+crude_oil_silver_scatterplot
+
+ggsave("fig/scatterplot_crude_oil_versus_silver.png")
+
+crude_oil_platinum_scatterplot <- crude_oil_in_commodities_market %>%
+  ggplot(aes(closing_price, gasoline_closing_price)) +
+  geom_point(aes(color = commodity), size = 1, show.legend = FALSE) +
+  xlab("Crude Oil Closing Price") +
+  ylab("Platinum Closing Price") +
+  ggtitle("Scatterplot of Crude Oil and Platinum Closing Prices: 2010 - 2020") +
+  theme_economist() +
+  theme(legend.position="top",
+        legend.title = element_blank(),
+        legend.box = "horizontal" ,
+        legend.text=element_text(size=8.5)) +
+  guides(col = guide_legend(nrow = 1))
+
+crude_oil_platinum_scatterplot
+
+ggsave("fig/scatterplot_crude_oil_versus_platinum.png")
+
 ### It plots the 2010-2020 timeline of crude oil daily closing prices compared to those of the three agricultural commodities
 ### Then, it saves the plot in a .png file entitled "crude_oil_price_history_in_comparison_to_three_competing_agriculture_sector_commodities"
 
@@ -197,6 +303,59 @@ crude_oil_vs_agriculture_plot <- crude_oil_vs_agriculture %>%
 crude_oil_vs_agriculture_plot
 
 ggsave("fig/crude_oil_in_comparison_to_three_agricultural_sector_commodities.png")
+
+#### As a final step, it generates scatterplots portraying the relationships between crude oil closing prices and those of the agriculture commodities
+
+crude_oil_wheat_scatterplot <- crude_oil_in_commodities_market %>%
+  ggplot(aes(closing_price, gold_closing_price)) +
+  geom_point(aes(color = commodity), size = 1, show.legend = FALSE) +
+  xlab("Crude Oil Closing Price") +
+  ylab("Wheat Closing Price") +
+  ggtitle("Scatterplot of Crude Oil and Wheat Prices: 2010 - 2020") +
+  theme_economist() +
+  theme(legend.position="top",
+        legend.title = element_blank(),
+        legend.box = "horizontal" ,
+        legend.text=element_text(size=8.5)) +
+  guides(col = guide_legend(nrow = 1))
+
+crude_oil_wheat_scatterplot
+
+ggsave("fig/scatterplot_crude_oil_versus_wheat.png")
+
+crude_oil_rice_scatterplot <- crude_oil_in_commodities_market %>%
+  ggplot(aes(closing_price, rice_closing_price)) +
+  geom_point(aes(color = commodity), size = 1, show.legend = FALSE) +
+  xlab("Crude Oil Closing Price") +
+  ylab("Rice Closing Price") +
+  ggtitle("Scatterplot of Crude Oil and Rice Closing Prices: 2010 - 2020") +
+  theme_economist() +
+  theme(legend.position="top",
+        legend.title = element_blank(),
+        legend.box = "horizontal" ,
+        legend.text=element_text(size=8.5)) +
+  guides(col = guide_legend(nrow = 1))
+
+crude_oil_rice_scatterplot
+
+ggsave("fig/scatterplot_crude_oil_versus_rice.png")
+
+crude_oil_soybeans_scatterplot <- crude_oil_in_commodities_market %>%
+  ggplot(aes(closing_price, gasoline_closing_price)) +
+  geom_point(aes(color = commodity), size = 1, show.legend = FALSE) +
+  xlab("Crude Oil Closing Price") +
+  ylab("Soybean Closing Price") +
+  ggtitle("Scatterplot of Crude Oil and Soybean Closing Prices: 2010 - 2020") +
+  theme_economist() +
+  theme(legend.position="top",
+        legend.title = element_blank(),
+        legend.box = "horizontal" ,
+        legend.text=element_text(size=8.5)) +
+  guides(col = guide_legend(nrow = 1))
+
+crude_oil_soybeans_scatterplot
+
+ggsave("fig/scatterplot_crude_oil_versus_soybean.png")
 
 
   
