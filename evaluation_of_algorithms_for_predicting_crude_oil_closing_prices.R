@@ -59,7 +59,7 @@ crude_oil_average_by_quarter_of_the_year <- crude_oil_train %>%
   group_by(date_quarter_of_the_year) %>%
   summarize(b_q_y = mean(closing_price))
 
-predicted_price_algorithm_03 <- crude_oil_test %>%
+predicted_price_algorithm_04 <- crude_oil_test %>%
   left_join(crude_oil_average_by_quarter_of_the_year, by= 'date_quarter_of_the_year') %>%
   mutate(pred = b_q_y) %>%
   pull(pred)
@@ -142,7 +142,7 @@ rmses <- sapply(nodesize, function(n){
                            date_month +
                            date_year, 
                          data = crude_oil_train, nodesize = n)
-  pred <- predict(rf, newdata = crude_oil_train)
+  pred <- predict(rf_time, newdata = crude_oil_train)
   RMSE(pred, crude_oil_train$closing_price)
 })
 
@@ -496,3 +496,4 @@ Results <- data.frame(ALGORITHM_tab, RMSE_tab)
 Results %>%
   arrange(RMSE_tab) %>%
   print(right = FALSE)
+
