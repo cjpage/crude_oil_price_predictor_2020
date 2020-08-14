@@ -1,0 +1,225 @@
+---
+title: "Crude Oil Price Predictor 2020"
+author: "Christopher Page"
+date: "8/12/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction/Overview/Executive Summary
+
+Oil is an important commodity.  Some of our planet's inhabitants produce it.  Many more consume it. All are affected by it.  Because of its wide-ranging effects, oil commands collective attention enabled by analysis. One of the key metrics to take into account in the analysis of the oil indutry is the daily closing price of crude oil futures traded on a global basis in such venues as the New York Mercantile Exchange. 
+
+Methods for predicting that price may entail studying the quantitative and qualitative factors at play inside the oil industry as well as in such adjacent industries as transportation and manufacturing. They may also entail studying the often complex diplomatic, military, economic, cultural, and environmental developments that help explain why crude oil closing prices rise and fall as they do over time. 
+
+This project proposes a simpler method, one that predicts crude oil closing prices based on time and the closing prices of complementary (e.g., gasoline) and competing (e.g., platinum) commodities. The premise is that there is much to be learned by studying the behaviors of commodity traders engaged in making daily investment decisions based on running evaluations of risks and rewards. 
+
+That premise informed the development of algorithms with the potential to predict crude oil closing prices with a viable level of accuracy, quantified as the Root Means Square Error (RMSE). Using a 25,190-row data set constructed with publicly available information downloaded for free from https://www.nasdaq.com/, the author developed and then evaluated fifteen such algorithms.
+
+The evaluation process led to the selection of one algorithm that produced the lowest RMSE when applied to a randomly generated test set. That algorithm used a Ranger model ^[Characterized by https://www.rdocumentation.org/ as a "fast implementation of random forests"] which took into account the *year* and *month* components of time as well as the closing prices of four other globally traded commodities: (1) *heating oil*, (2) *gasoline*, (3) *platinum*, and (4) *soybeans*.
+
+The RMSE in question was **2.93**, a figure equating to 12% of the 23.51 produced by an initial algorithm that only took into account the average closing price of crude oil across the period of observation.  Because of the relatively small RMSE, the selected algorithm could be considered analytically viable and, therefore, of use to those engaged in analzing the oil industry.
+
+## Method/Analysis
+
+The first step was to load all of the necessary *R* libraries from the publicly available repository http://cran.us.r-project.org. Those
+libraries included *caret*, *caTools*, *dplyr*, *forcats*, *foreach*, *gam*, *ggplot2*, *ggrepel*, *ggthemes*, *knitr*, *lubridate*, *purrr*, *randomForest*, *ranger*, and *tidyverse*.  The *randomForest* and *ranger* packages proved to be of particular value because of the models they introduced.
+
+```{r load libraries, warning=FALSE, message=FALSE, echo = FALSE}
+
+### This part of the script loads the necessary libraries from the repository http://cran.us.r-project.org
+
+if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
+if(!require(caTools)) install.packages("caTools", repos = "http://cran.us.r-project.org")
+if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
+if(!require(dslabs)) install.packages("dslabs", repos = "http://cran.us.r-project.org")
+if(!require(forcats)) install.packages("forcats", repos = "http://cran.us.r-project.org")
+if(!require(foreach)) install.packages("foreach", repos = "http://cran.us.r-project.org")
+if(!require(gam)) install.packages("gam", repos = "http://cran.us.r-project.org")
+if(!require(ggplot2)) install.packages("ggplot2", repos = "http://cran.us.r-project.org")
+if(!require(ggrepel)) install.packages("ggrepel", repos = "http://cran.us.r-project.org")
+if(!require(ggthemes)) install.packages("ggthemes", repos = "http://cran.us.r-project.org")
+if(!require(knitr)) install.packages("knitr", repos = "http://cran.us.r-project.org")
+if(!require(lubridate)) install.packages("lubridate", repos = "http://cran.us.r-project.org")
+if(!require(purrr)) install.packages("purrr", repos = "http://cran.us.r-project.org")
+if(!require(randomForest)) install.packages("randomForest", repos = "http://cran.us.r-project.org")
+if(!require(ranger)) install.packages("ranger", repos = "http://cran.us.r-project.org")
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+
+```
+The second step entailed loading *commodity_closing_prices_2010_2020.csv*, a file containing commodity closing prices for a period of observation extending from the beginning of August 2010 to the end of July 2020, and then wrangling the data in a manner that would result in ready access to information detailing the cyclical and linear components of time as well as the daily closing prices of crude oil and nine other commodities from the energy, precious metals, and agriculture sectors. 
+
+```{r load download and wrangle data, warning=FALSE, message=FALSE, echo = FALSE}
+
+### This part of the script reads "data/commodity_closing_prices_2010_2020.csv" into a new data frame named "commodities"
+### Then, it mutates the resulting data set in way that will enable the envisioned analysis
+### Next, it saves that data frame into a .RDATA data set under the RDA subdirectory
+
+commodities <- read_csv("data/commodity_closing_prices_2010_2020.csv")
+
+commodities <- commodities %>%
+  rename(date = Date) %>%
+  mutate(date = as.Date(mdy(date))) %>%
+  mutate(date_year = year(date)) %>%
+  mutate(date_quarter_of_the_year = quarter(date)) %>%
+  mutate(date_month = round_date(date, unit = "months")) %>%
+  mutate(date_month_of_the_year = month(date)) %>%
+  mutate(date_day = day(date)) %>%
+  mutate(date_weekday = weekdays(date)) %>%
+  rename(commodity = Commodity) %>%
+  rename(sector = Sector) %>%
+  rename(closing_price = `Closing Price`)
+
+save(commodities, file = "rda/commodities.rdata")
+
+### This part generates and saves data sets focused on the energy, precious metals, and agricultural sectors
+
+energy <- commodities %>%
+  filter(sector == 'Energy')
+save(energy, file = "rda/energy.rdata")
+
+precious_metals <- commodities %>%
+  filter(sector == 'Precious Metals')
+save(precious_metals, file = "rda/precious_metals.rdata")
+
+agriculture <- commodities %>%
+  filter(sector == 'Agriculture')
+save(agriculture, file = "rda/agriculture.rdata")
+
+### This part generates and saves a data set focused on crude oil
+
+crude_oil <- energy %>%
+  filter(commodity == 'Crude Oil')
+save(crude_oil, file = "rda/crude_oil.rdata")
+
+### This part generates and saves data sets focused on the commodities (other than crude oil) in the energy sector
+
+natural_gas <- energy %>%
+  filter(commodity == 'Natural Gas') %>%
+  rename(natural_gas_closing_price = closing_price)
+save(natural_gas, file = "rda/natural_gas.rdata")
+
+heating_oil <- energy %>%
+  filter(commodity == 'Heating Oil') %>%
+  rename(heating_oil_closing_price = closing_price)
+save(natural_gas, file = "rda/heating_oil.rdata")
+
+gasoline <- energy %>%
+  filter(commodity == 'Gasoline') %>%
+  rename(gasoline_closing_price = closing_price)
+save(gasoline, file = "rda/gasoline.rdata")
+
+### This part generates and saves data sets focused on the commodities in the precious metals sector
+
+gold <- precious_metals %>%
+  filter(commodity == 'Gold') %>%
+  rename(gold_closing_price = closing_price)
+save(natural_gas, file = "rda/gold.rdata")
+
+silver <- precious_metals %>%
+  filter(commodity == 'Silver') %>%
+  rename(silver_closing_price = closing_price)
+save(natural_gas, file = "rda/silver.rdata")
+
+platinum <- precious_metals %>%
+  filter(commodity == 'Platinum') %>%
+  rename(platinum_closing_price = closing_price)
+save(gasoline, file = "rda/platinum.rdata")
+
+### This part generates and saves data sets focused on the commodities in the agriculture sector
+
+wheat <- agriculture %>%
+  filter(commodity == 'Wheat') %>%
+  rename(wheat_closing_price = closing_price)
+save(wheat, file = "rda/wheat.rdata")
+
+rice <- agriculture %>%
+  filter(commodity == 'Rice') %>%
+  rename(rice_closing_price = closing_price)
+save(rice, file = "rda/rice.rdata")
+
+soybeans <- agriculture %>%
+  filter(commodity == 'Soybeans') %>%
+  rename(soybeans_closing_price = closing_price)
+save(soybeans, file = "rda/soybeans.rdata")
+
+### This part generates a table that compares crude oil's closing price to the closing prices of all other commodities
+
+natural_gas_price_table <- natural_gas %>% select(date, natural_gas_closing_price)
+heating_oil_price_table <- heating_oil %>% select(date, heating_oil_closing_price)
+gasoline_price_table <- gasoline %>% select(date, gasoline_closing_price)
+
+gold_price_table <- gold %>% select(date, gold_closing_price)
+silver_price_table <- silver %>% select(date, silver_closing_price)
+platinum_price_table <- platinum %>% select(date, platinum_closing_price)
+
+wheat_price_table <- wheat %>% select(date, wheat_closing_price)
+rice_price_table <- rice %>% select(date, rice_closing_price)
+soybeans_price_table <- soybeans %>% select(date, soybeans_closing_price)
+
+crude_oil_in_commodities_market <- crude_oil %>%
+  left_join(natural_gas_price_table) %>%
+  left_join(heating_oil_price_table) %>%
+  left_join(gasoline_price_table) %>%
+  left_join(gold_price_table) %>%
+  left_join(silver_price_table) %>%
+  left_join(platinum_price_table) %>%
+  left_join(wheat_price_table) %>%
+  left_join(rice_price_table) %>%
+  left_join(soybeans_price_table)
+
+```
+
+```{r begin exploratory data analysis of crude oil in isolation, warning=FALSE, message=FALSE, echo = FALSE}
+
+minimum_crude_oil_price_during_period <- min(crude_oil$closing_price)
+maximum_crude_oil_price_during_period <- max(crude_oil$closing_price)
+mean_crude_oil_price_during_period <- mean(crude_oil$closing_price)
+standard_deviation_during_period <- sd(crude_oil$closing_price)
+
+Parameters <- c("Mininum", 
+                "Maximum", 
+                "Mean", 
+                "Standard Deviation")
+
+Values <- c(minimum_crude_oil_price_during_period, 
+            maximum_crude_oil_price_during_period, 
+            mean_crude_oil_price_during_period, 
+            standard_deviation_during_period)
+
+oil_summary <- data.frame(Parameters, Values)
+
+```
+
+Wrangling enabled explotatory data analyses that began with an examination of crude oil in isolation across the ten-year period of observation.  A plot generated through that examination made clear the history of crude oil closing prices as they rose and fell, often sharply, between the end of July 2010 and beginning of August 2020.  Of particular note was the rapid descent deeply into negative territory in April 2020 ^[See https://www.nytimes.com/2020/04/20/business/stock-market-live-trading-coronavirus.html for an example of news reports covering that event, widely characterized as "unprecedented".]  That descent helped account for prices having the following minimum, maximum, mean, and standard deviation.
+
+```{r display of minimum, maximum, mean, and standard deviation, warning=FALSE, message=FALSE, echo = FALSE}
+
+kable(oil_summary)
+
+```
+
+```{r generate plot of crude oil prices across the period of observation, echo=FALSE}
+
+crude_oil_plot <- crude_oil %>%
+  ggplot(aes(date, closing_price)) +
+  geom_point(aes(color = commodity)) +
+  xlab("Date") +
+  ylab("Closing Price") +
+  ggtitle("Crude Oil Price History") +
+  theme_economist() +
+    theme(legend.position="top",
+          legend.title = element_blank(),
+          legend.box = "horizontal" ,
+          legend.text=element_text(size=8.5)) +
+    guides(col = guide_legend(nrow = 1))
+
+```
+
+```{r show plot of crude oil prices across the period of observation, echo=FALSE}
+plot(crude_oil_plot)
+```
+
