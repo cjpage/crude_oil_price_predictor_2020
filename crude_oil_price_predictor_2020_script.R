@@ -179,8 +179,6 @@ ranger_time_energy_precious_metals_agriculture <-
         method = "ranger",
         data = crude_oil_train)
 
-ggplot(knn_time_energy, highlight = TRUE)
-
 pred <- predict(ranger_time_energy_precious_metals_agriculture, 
                 newdata = crude_oil_train)
 
