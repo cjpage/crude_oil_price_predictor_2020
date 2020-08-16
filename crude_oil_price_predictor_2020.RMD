@@ -1,7 +1,7 @@
 ---
 title: "Crude Oil Price Predictor 2020"
 author: "Christopher Page"
-date: "8/15/2020"
+date: "8/16/2020"
 output: pdf_document
 ---
 
@@ -11,17 +11,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction/Overview/Executive Summary
 
-Oil is an important commodity.  Some of our planet's inhabitants produce it.  Many more consume it. All are affected by it.  Because of its wide-ranging effects, oil commands collective attention enabled by analysis. One of the key metrics to take into account in the analysis of the oil indutry is the daily closing price of crude oil futures traded on a global basis in such venues as the New York Mercantile Exchange. 
+Oil is an important commodity. ^[A simple explanation of oil and products derived from oil is available at https://www.eia.gov/energyexplained/oil-and-petroleum-products/]  Some of our planet's inhabitants produce it.  Many more consume it. All are affected by it.  Because of its wide-ranging effects, oil commands collective attention enabled by analysis. One of the key metrics to take into account in the analysis of the oil indutry is the daily closing price of crude oil futures traded on a global basis in such venues as the New York Mercantile Exchange ^[https://www.cmegroup.com/company/nymex.html covers in depth and detail not only crude oil but other commodities traded via the New York Mercantile Exchange.]. 
 
 Methods for predicting that price may entail studying the quantitative and qualitative factors at play inside the oil industry as well as in such adjacent industries as transportation and manufacturing. They may also entail studying the often complex diplomatic, military, economic, cultural, and environmental developments that help explain why crude oil closing prices rise and fall as they do over time. 
 
 This project proposes a simpler method, one that predicts crude oil closing prices based on time and the closing prices of complementary (e.g., gasoline) and competing (e.g., platinum) commodities. The premise is that there is much to be learned by studying the behaviors of commodity traders engaged in making daily investment decisions based on running evaluations of risks and rewards. 
 
-That premise informed the development of algorithms with the potential to predict crude oil closing prices with a viable level of accuracy, quantified as the Root Means Square Error (RMSE). Using a data set constructed with publicly available information downloaded for free from https://www.nasdaq.com/, the author developed and then evaluated fifteen such algorithms.
+That premise informed the development of algorithms with the potential to predict crude oil closing prices with a viable level of accuracy, quantified as the Root Means Square Error (RMSE). Using a data set constructed with publicly available information downloaded for free from https://www.nasdaq.com/, the author developed and then evaluated eleven such algorithms.
 
 The evaluation process led to the selection of one algorithm that produced the lowest RMSE when applied to a randomly generated test set. That algorithm used a Ranger model ^[Characterized by https://www.rdocumentation.org/ as a "fast implementation of random forests"] which took into account the *year* and *month* components of time as well as the closing prices of four other globally traded commodities: (1) *heating oil*, (2) *gasoline*, (3) *platinum*, and (4) *soybeans*.
 
-The RMSE in question was **2.93**, a figure equating to 12% of the 23.51 produced by an initial algorithm that only took into account the average closing price of crude oil across the period of observation.  Because of the relatively small RMSE, the selected algorithm could be considered analytically viable and, therefore, of use to those engaged in analzing the oil industry.
+The RMSE in question was **1.79**, a figure equating to 8% of the RMSE produced by an initial algorithm that only took into account the average closing price of crude oil across the period of observation.  Because of the relatively small RMSE, the selected algorithm could be considered analytically viable and, therefore, of use to those engaged in analzing the oil industry.
 
 ## Method/Analysis
 
@@ -693,18 +693,35 @@ plot(crude_oil_soybeans_scatterplot)
 
 ##### Generating training and testing sets from the commodities data
 
-After completing the exploratory data analysis, the focus of the project turned to the generation of the training and testing sets.  Eighty percent of *crude_oil_in_commodites_market* was randomly selected to be in *crude_oil_train*.  The remaining twenty percent was held-back to be *crude_oil_test*.
+After completing the exploratory data analysis steps, the focus of the project turned to the generation of the *training*, *validation*, and *testing* sets. The *training* set would be used to train the crude oil price prediction algorithms being developed.  The *validation* set would be used to evaluate each candidate algorithm's performance in terms of RMSE.  The *testing* set would be employed at the end of the process to evaluate the final model ^[See https://towardsdatascience.com/train-validation-and-test-sets-72cb40cba9e7 for a good explanation of the roles of training, validation, and training sets.].
+
+Because crude oil closing prices in the original data set had a 0.34 Coefficient of Variation (CV), calculated by dividing the 23.5 Standard Deviation (SD) ^[See https://ncalculators.com/statistics/coefficient-of-variance-calculator.htm#:~:text=The%20method%20of%20measuring%20the%20ratio%20of%20standard,%28%CF%83%29%20%2F%20Mean%20%28%CE%BC%29%29will%20be%20multiplied%20by%20100 for a good explanation of CV's role in Quality Assurance (QA) as a means of "determining the content or quality of the sample data."] by the 70.1 mean, the decision was made to hold-back 34% of *crude_oil_in_commodites_market* for testing purposes.  That decision was later validated by trial runs demonstrating the accuracies obtained by using 66% of the data for *training and validation* and 34% for *testing.*
+
+The same logic was used to determine the optimal split of the remaining 66% into the *training* and *validation* sets.  The CV of that remainder was 33%.  To mitigate the risk, identified after several trial runs, of overtraining, a 10% margin was added to that figure. Consequently, *p* was set at 0.43.
 
 ``` {r generation of training and testing sets, warning=FALSE, message=FALSE, echo = TRUE}
 
-set.seed(755)
+### Generate 34% hold-out TEST set to be used in validation of final algorithm
+
+set.seed(1)
 
 test_index <- createDataPartition(y = crude_oil_in_commodities_market$commodity, 
-                                  times = 1, p = 0.2, list = FALSE)
+                                  times = 1, p = 0.34, list = FALSE)
 
-crude_oil_train <- crude_oil_in_commodities_market[-test_index,]
+crude_oil_in_commodities_market_train <- crude_oil_in_commodities_market[-test_index,]
 
 crude_oil_test <- crude_oil_in_commodities_market[test_index,]
+
+### Split remaining 66% into TRAIN and VALIDATE sets
+
+set.seed(755)
+
+test_index <- createDataPartition(y = crude_oil_in_commodities_market_train$commodity, 
+                                  times = 1, p = 0.43, list = FALSE)
+
+crude_oil_train <- crude_oil_in_commodities_market_train[-test_index,]
+
+crude_oil_validate <- crude_oil_in_commodities_market_train[test_index,]
 
 ```
 
@@ -716,7 +733,7 @@ RMSE <- function(true_ratings, predicted_ratings){
 
 ##### Algorithm 01 (Average)
 
-The next step involved developing and then evaluating the prediction algorithms, the first of which predicted crude oil closing prices based solely on the average crude oil price for the 2010-2020 period of observation.  It would serve as a baseline from which to compare the analytical viability of other, more sophisticated algorithms.  Not surprisingly, it had an RMSE that closely approximated the standard deviation of the original data set.
+The next step involved developing and then evaluating the prediction algorithms, the first of which predicted crude oil closing prices based solely on the average crude oil price for the 2010-2020 period of observation.  It would serve as a baseline from which to compare the analytical viability of other, more sophisticated algorithms.  Not surprisingly, it had an RMSE closely approximating the 23.5 standard deviation of the original data set.
 
 ``` {r algorithm 01, warning=FALSE, message=FALSE, echo = TRUE}
 
@@ -725,7 +742,7 @@ mu <- mean(crude_oil_train$closing_price)
 predicted_price_algorithm_01 <- mu
 
 RMSE01 <- RMSE(predicted_price_algorithm_01, 
-               crude_oil_test$closing_price)
+               crude_oil_validate$closing_price)
 
 RMSE01
 
@@ -741,13 +758,14 @@ crude_oil_average_by_year <- crude_oil_train %>%
   group_by(date_year) %>%
   summarize(b_y = mean(closing_price))
 
-predicted_price_algorithm_02 <- crude_oil_test %>%
+predicted_price_algorithm_02 <- 
+  crude_oil_validate %>%
   left_join(crude_oil_average_by_year, 
             by= 'date_year') %>%
   pull(b_y)
 
 RMSE02 <- RMSE(predicted_price_algorithm_02, 
-               crude_oil_test$closing_price)
+               crude_oil_validate$closing_price)
 
 RMSE02
 
@@ -756,7 +774,7 @@ RMSE02
 
 ##### Algorithm 03 (Month Effects)
 
-Incorporating *month*, the second of the two linear time components identified as promising through exploratotary data analysis, the third algorithm generated an RMSE that was even smaller and, therefore, more analytically viable.  That third algorithm relied not on the monthly averages for each of the months in the 2010-2020 period of observation.
+Incorporating *month*, the second of the two linear time components identified as promising through exploratotary data analysis, the third algorithm generated an RMSE that was even smaller and, therefore, more analytically viable.  That third algorithm relied on the monthly averages for each of the months in the 2010-2020 period of observation.
 
 ``` {r algorithm 03, warning=FALSE, message=FALSE, echo = TRUE}
 
@@ -766,14 +784,16 @@ crude_oil_average_by_month <-
   summarize(b_m = mean(closing_price))
 
 predicted_price_algorithm_03 <- 
-  crude_oil_test %>%
+  crude_oil_validate %>%
   left_join(crude_oil_average_by_month, 
             by= 'date_month') %>%
   mutate(pred = b_m) %>%
   pull(pred)
 
 RMSE03 <- RMSE(predicted_price_algorithm_03, 
-               crude_oil_test$closing_price)
+               crude_oil_validate$closing_price)
+
+RMSE03
 
 ```
 #### Algorithm 04 (Random Forest - Time)
@@ -852,17 +872,17 @@ pred <- predict(rf_time, newdata = crude_oil_train)
 
 predicted_price_algorithm_04 <- 
   predict(rf_time, 
-          newdata = crude_oil_test)
+          newdata = crude_oil_validate)
 
 RMSE04 <- RMSE(predicted_price_algorithm_04, 
-               crude_oil_test$closing_price)
+               crude_oil_validate$closing_price)
 
 RMSE04
 
 ```
 #### Algorithm 05 (KNN - Time)
 
-With the intention of finding an algorithm that would be of significant analytical value, attention shifted again, this time to an algorithm that predicted crude oil closing prices based on a K-Nearest Neighbors (KNN) model of the two key time components: *year* and *month*. The RMSE, much like the RMSE generated via the fourth item, stil not significantly better than the outcome obtained from a simple model of the effects of the month-by-month average closing price.
+With the intention of finding an algorithm that would be of significant analytical value, attention shifted again, this time to an algorithm that predicted crude oil closing prices based on a K-Nearest Neighbors (KNN) model of the two key time components: *year* and *month*. The RMSE, although not significantly better than the outcome obtained from a simple model of the effects of the month-by-month average closing price, was strong enough to suggest that KNN would be worthy of further investigation when the time came to consider not only the time components but the prices of complementary and competing commodities from the energy, precious metals, and agriculture sectors.
 
 ``` {r algorithm 05, warning=FALSE, message=FALSE, echo = TRUE}
 
@@ -880,17 +900,17 @@ pred <- predict(knn_time,
 
 predicted_price_algorithm_05 <- 
   predict(knn_time, 
-          newdata = crude_oil_test)
+          newdata = crude_oil_validate)
 
 RMSE05 <- RMSE(predicted_price_algorithm_05, 
-               crude_oil_test$closing_price)
+               crude_oil_validate$closing_price)
 
 RMSE05
 
 ```
 ### Algorithm 06 (Ranger - Time)
 
-The continued quest for a lower RMSE and, with it, a more valuable algorithm led to the use of a Ranger model incorporating *year* and *month*.  That effort's outcome suggested the Ranger model would, alongside KNN, be worthy of further exploration when the time came to consider not only time but the prices of complementary and competing commodities from the energy, precious metals, and agriculture sectors.
+The continued quest for a lower RMSE and, with it, a more valuable algorithm led to the use of a Ranger model incorporating *year* and *month*.  That effort's outcome suggested the Ranger model, alongside KNN, be worthy of further investigation when the time came to consider not only the key time components but the prices of complementary and competing commodities from the energy, precious metals, and agriculture sectors.
 
 ``` {r algorithm 06, warning=FALSE, message=FALSE, echo = TRUE}
 
@@ -906,17 +926,17 @@ pred <- predict(ranger_time,
 
 predicted_price_algorithm_06 <- 
   predict(ranger_time, 
-          newdata = crude_oil_test)
+          newdata = crude_oil_validate)
 
 RMSE06 <- RMSE(predicted_price_algorithm_06,
-               crude_oil_test$closing_price)
+               crude_oil_validate$closing_price)
 
 RMSE06
 
 ```
 #### Algorithm 07 (KNN - Time and Energy)
 
-Continuing the question for a lower RMSE, the focus of the algorithm effort fell on the use of a KNN model that took into account not only *year* and *month* but the closing prices of two energy sector commodities: *heating oil* and *gasoline*.  The generated RMSE, the first to cross below the 3.00 threshold, spoke to the potential that the seventh algorithm would be of significant analytical value.
+Continuing the question for a lower RMSE, the focus of the algorithm effort fell on the use of a KNN model that took into account not only *year* and *month* but the closing prices of two energy sector commodities: *heating oil* and *gasoline*.  The generated RMSE, the first to cross below the 3.3 (14% of the RMSE generated by the first algorithm) threshold, spoke to the potential that the seventh algorithm would be of significant analytical value.
 
 ``` {r algorithm 07, warning=FALSE, message=FALSE, echo = TRUE}
 
@@ -936,17 +956,17 @@ pred <- predict(knn_time_energy,
 
 predicted_price_algorithm_07 <- 
   predict(knn_time_energy, 
-          newdata = crude_oil_test)
+          newdata = crude_oil_validate)
 
 RMSE07 <- RMSE(predicted_price_algorithm_07, 
-               crude_oil_test$closing_price)
+               crude_oil_validate$closing_price)
 
 RMSE07
 
 ```
 #### Algorithm 08 (Ranger - Time and Energy)
 
-The next attempt centered on the use of a Ranger model that also took into account not only *year* and *month* but the closing prices of two energy sector commodities: *heating oil* and *gasoline*.  The generated RMSE, the second to cross below the 3.00 threshold, spoke to the potential that the eighth algorithm would, like the seventh, be of significant analytical value.
+The next attempt centered on the use of a Ranger model that also took into account not only *year* and *month* but the closing prices of two energy sector commodities: *heating oil* and *gasoline*.  The generated RMSE, the first to cross below the 3.0 (13% of the RMSE generated by the first algorithm) threshold, spoke to the potential that the eighth algorithm would, like the seventh, be of significant analytical value.
 
 ``` {r algorithm 08, warning=FALSE, message=FALSE, echo = TRUE}
 
@@ -966,19 +986,51 @@ pred <- predict(ranger_time_energy,
 
 predicted_price_algorithm_08 <- 
   predict(ranger_time_energy, 
-          newdata = crude_oil_test)
+          newdata = crude_oil_validate)
 
 RMSE08 <- RMSE(predicted_price_algorithm_08, 
-               crude_oil_test$closing_price)
+               crude_oil_validate$closing_price)
 
 RMSE08
 
 ```
-#### Algorithm 09 (Ranger - Time, Energy, Precious Metals, Agriculture)
+#### Algorithm 09 (KNN - Time, Energy, Precious Metals, Agriculture)
 
-Incorporating the rest of the promising predictors and leveraging the identified strength of Ranger, the next step entailed evaluating an algorithm that made use of a Ranger model accounting for *year*, *month*, and the closing prices of *heating oil* and *gasoline* but the closing prices of *platinum* and *soybeans*.  The generated RMSE, the first to cross below the 2.95 threshold, made clear that the ninth item would of significant value to those engaged in analyzing the oil industry through crude oil price trends.
+Incorporating the rest of the promising predictors and leveraging the identified strength of KNN, the next step entailed evaluating an algorithm that made use of a KNN model accounting for not only *year*, *month*, and the closing prices of *heating oil* and *gasoline* but the closing prices of *platinum* and *soybeans*.  The generated algorithm turned-out not to be as strong as anticipated.  Therefore, the ninth algorithm was not deemed to be as analytically valuable as the seventh or eighth.
 
 ``` {r algorithm 09, warning=FALSE, message=FALSE, echo = TRUE}
+
+knn_time_energy_precious_metals_agriculture <- 
+  train(closing_price ~
+          date_year + 
+          date_month + 
+          heating_oil_closing_price +
+          gasoline_closing_price +
+          platinum_closing_price +
+          soybeans_closing_price,
+          method = "knn",
+        data = crude_oil_train)
+
+ggplot(knn_time_energy, highlight = TRUE)
+
+pred <- predict(knn_time_energy_precious_metals_agriculture, 
+                newdata = crude_oil_train)
+
+predicted_price_algorithm_09 <- 
+  predict(knn_time_energy_precious_metals_agriculture, 
+          newdata = crude_oil_validate)
+
+RMSE09 <- RMSE(predicted_price_algorithm_09, 
+               crude_oil_validate$closing_price)
+
+RMSE09
+
+```
+#### Algorithm 10 (Ranger - Time, Energy, Precious Metals, Agriculture)
+
+Now incorporating the rest of the promising predictors and leveraging the identified strength of Ranger, the penultimate step of this phase of the project entailed evaluating an algorithm that made use of a Ranger model accounting for *year* and *month* as well as the closing prices of *heating oil*, *gasoline*, *platinum*, and *soybeans*.  The generated algorithm turned-out be very strong, having an RMSE equating to 12% of the RMSE generated by the first algorithm.  Because of its strength, it appeared to be of particularly high value to those who analyze the oil industry by tracking crude oil's rises and falls in commodity markets.
+
+``` {r algorithm 10, warning=FALSE, message=FALSE, echo = TRUE}
 
 ranger_time_energy_precious_metals_agriculture <- 
   train(closing_price ~
@@ -991,18 +1043,137 @@ ranger_time_energy_precious_metals_agriculture <-
           method = "ranger",
         data = crude_oil_train)
 
-ggplot(ranger_time_energy, highlight = TRUE)
+ggplot(knn_time_energy, highlight = TRUE)
 
 pred <- predict(ranger_time_energy_precious_metals_agriculture, 
                 newdata = crude_oil_train)
 
-predicted_price_algorithm_09 <- 
+predicted_price_algorithm_10 <- 
+  predict(ranger_time_energy_precious_metals_agriculture, 
+          newdata = crude_oil_validate)
+
+RMSE10 <- RMSE(predicted_price_algorithm_10, 
+               crude_oil_validate$closing_price)
+
+RMSE10
+
+```
+#### Algorithm 11 (GAM - Time, Energy, Precious Metals, Agriculture)
+
+The final step of this phase of the project called for using the Generalized Additive Model (GAM) to take one more look at ways to lower the GMSE below the already-low level achieved via the Ranger model that took into account *year* and *month* as well as the closing prices of *heating oil*, *gasoline*, *platinum*, and *soybeans*.  That eleventh and last algorithm did not generate a result that suggested GAM would be a viable alternative to Ranger or even KNN.
+
+``` {r algorithm 11, warning=FALSE, message=FALSE, echo = TRUE}
+
+gam_time_energy_precious_metals_agriculture <- 
+  train(closing_price ~
+          date_year + 
+          date_month + 
+          heating_oil_closing_price +
+          gasoline_closing_price +
+          platinum_closing_price +
+          soybeans_closing_price,
+          method = "gam",
+        data = crude_oil_train)
+
+pred <- predict(gam_time_energy_precious_metals_agriculture, 
+                newdata = crude_oil_train)
+
+predicted_price_algorithm_11 <- 
+  predict(gam_time_energy_precious_metals_agriculture, 
+          newdata = crude_oil_validate)
+
+RMSE11 <- RMSE(predicted_price_algorithm_11, 
+               crude_oil_validate$closing_price)
+
+RMSE11
+
+```
+\newpage
+
+## Results
+
+##### Tabulating the Results
+
+Of the eleven algorithms evaluated with the *validation* set, the strongest was the one that made use of a Ranger model and took into account the six predictors identified as promising in the exploratory data analysis phase.  Those six predictors were the *year* and *month* components of time, the closing prices of the complementary *heating oil* and *gasoline* commodities from the energy sector, and the closing prices of the competing *platinum* and *soybean* commodities from the precious metals and agriculture sectors.
+
+``` {r result tabulation, warning=FALSE, message=FALSE, echo = FALSE}
+
+Algorithm <- c("01",
+               "02",
+               "03",
+               "04",
+               "05",
+               "06",
+               "07",
+               "08",
+               "09",
+               "10",
+               "11")
+
+Title <- c("Average Closing Price",
+           "Average Closing Price plus Year Effects",
+           "Average Closing Price Plus Month Effects",
+           "Random Forest - Time",
+           "KNN Model - Time",
+           "Ranger Model - Time",
+           "KNN Model - Time and Energy",
+           "Ranger Model - Time and Energy",
+           "KNN Model - Time, Energy, Precious Metals, Agriculture",
+           "Ranger Model - Time, Energy, Precious Metals, Agriculture",
+           "GAM - Time, Energy, Precious Metals, Agriculture")
+  
+Result <- c(RMSE01,
+            RMSE02,
+            RMSE03,
+            RMSE04,
+            RMSE05,
+            RMSE06,
+            RMSE07,
+            RMSE08,
+            RMSE09,
+            RMSE10,
+            RMSE11)
+
+Results <- data.frame(Algorithm, Title, Result)
+
+Results %>%
+  arrange(Result) %>%
+  kable()
+
+
+```
+
+
+##### Putting the Final Algorithm to the Test
+
+The strongest algorithm, the one that made use of a Ranger model that took into the account the six most promising predictors identified in the exploratory data analysis phase, was applied to the 34% hold-out *test* set.  The result, an RMSE equating to 8% of the RMSE generated by simply using the average price across the 2010-2020 period of observation, confirmed the discovery of an algorithm of robust analytical value.  We had found a tool that would be of use to those engaged in monitoring a commodity of great importance not only to producers and consumers but, as laid-out in the introductory section of this report, all of the planet's inhabitants.
+
+
+``` {r test of final algorithm, warning=FALSE, message=FALSE, echo = TRUE}
+
+predicted_price_algorithm_10 <- 
   predict(ranger_time_energy_precious_metals_agriculture, 
           newdata = crude_oil_test)
 
-RMSE09 <- RMSE(predicted_price_algorithm_09, 
+RMSE_final <- RMSE(predicted_price_algorithm_10, 
                crude_oil_test$closing_price)
 
-RMSE09
+RMSE_final
 
 ```
+\newpage
+
+## Conclusions
+
+##### Summary
+
+The purpose of this project was to select an algorithm capable of predicting crude oil closing prices with an analytically viable RMSE. Eleven algorithms were developed and evaluated. The one selected at the end of the evaluation process made use of a Ranger model taking into account six predictors: the *year* and *month* components of time, the closing prices of the complementary *heating oil* and *gasoline* commodities from the energy sector, and the closing prices of the competing *platinum* and *soybeans* commodities from the precious metals and agriculture sectors. When tested against a 34%-holdout data set, it generated an RMSE of 1.79, equating to a mere 8% of the RMSE resulting from a simply algorithm that relied on the average closing price across the volatile 2010-2020 period of observation.
+
+##### Limitations
+
+This project used a ten-year period of observation and only took into account three widely traded commodities each from the energy, precious metals, and agriculture sectors of the global marketplace.  A more complete analysis would use a longer period of observation and take into account additional commodities, particularly from the base metals and livestock sectors, as well as such additional predictors as stock prices and currency values.  The premise is that more could be learned about oil by further exploring the behaviors of investors who make day-to-day "bets" on crude oil based on their running evaluations of relative risks and rewards.
+
+##### Future Work
+
+The author, whose interest in crude oil was piqued by this opportunity to use data to explore generally unfamilar data, is keen on using not only the additional data summarized in the preceding paragraph but additonal tools to assemble a more accurate model for predicting the closing prices of crude oil.  The motivation for such an endeavor is the knowledge that crude oil has long had and will long continue to have wide-ranging impacts, both of the beneficial and detrimental varieties, on not only the few who produce it and the many who consume it but all of us who share this planet.
+
