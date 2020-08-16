@@ -2,6 +2,8 @@
 ### Christopher Page
 ### 16 August 2020
 
+### GitHub repository: https://github.com/cjpage/crude_oil_price_predictor_2020
+
 ### This part of the script loads the necessary libraries from the repository http://cran.us.r-project.org
 
 if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
